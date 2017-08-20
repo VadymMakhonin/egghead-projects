@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { createStore } from 'redux';
 
 const counter = (state = 0, action) => {
   switch (action.type) {
@@ -12,6 +11,30 @@ const counter = (state = 0, action) => {
     default:
       return state;
   }
+};
+
+const createStore = (reducer) => {
+  let state;
+  let listeners = [];
+
+  let getState = () => state;
+
+  let dispatch = (action) => {
+    state = reducer(state, action);
+    listeners.forEach(listener => listener());
+  };
+
+  let subscribe = (listener) => {
+    listeners.push(listener);
+
+    return () => {
+      listeners = listeners.filter(l => l !== listener);
+    }
+  };
+
+  dispatch({});
+
+  return { getState, dispatch, subscribe };
 };
 
 const store = createStore(counter);
